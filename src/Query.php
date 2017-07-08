@@ -280,56 +280,56 @@ class Query implements IteratorAggregate
      *
      * @return string The MongoDB query.
      */
-    public function compileQuery()
-    {
-        if ($this->_parts['fields']) {
-            $this->_mongoQuery['projection'] =
-                array_combine($this->_parts['fields'], array_fill(0, count($this->_parts['fields']), 1));
-        }
+     public function compileQuery()
+     {
+         if ($this->_parts['fields']) {
+             $this->_mongoQuery['projection'] =
+                 array_combine($this->_parts['fields'], array_fill(0, count($this->_parts['fields']), 1));
+         }
 
-        if ($this->_parts['limit']) {
-            $this->_mongoQuery['limit'] = $this->_parts['limit'];
-        }
+         if ($this->_parts['limit']) {
+             $this->_mongoQuery['limit'] = $this->_parts['limit'];
+         }
 
-        if ($this->_parts['offset']) {
-            $this->_mongoQuery['skip'] = $this->_parts['offset'];
-        }
+         if ($this->_parts['offset']) {
+             $this->_mongoQuery['skip'] = $this->_parts['offset'];
+         }
 
-        if ($this->_parts['order']) {
+         if ($this->_parts['order']) {
 
-            $this->_mongoQuery['sort'] = collection($this->_parts['order'])->map(function ($item) {
+             $this->_mongoQuery['sort'] = collection($this->_parts['order'])->map(function ($item) {
 
-                $key = key($item);
+                 $key = key($item);
 
-                $order = $item[$key];
+                 $order = $item[$key];
 
-                return [
-                    'key' => $key,
-                    'order' => ($order['order'] == 'desc' ? -1 : 1)
-                ];
+                 return [
+                     'key' => $key,
+                     'order' => ($order['order'] == 'desc' ? -1 : 1)
+                 ];
 
-            })->reduce(function ($carry, $item) {
+             })->reduce(function ($carry, $item) {
 
-                $carry[$item['key']] = $item['order'];
+                 $carry[$item['key']] = $item['order'];
 
-                return $carry;
+                 return $carry;
 
-            }, []);
+             }, []);
 
-        }
+         }
 
-        if ($this->_parts['filter']) {
+         if ($this->_parts['filter']) {
 
-            $this->_mongoQuery['filter'] = array_reduce($this->_parts['filter'], function ($carry, AbstractFilter $filter) {
-                $filterArray = $filter->toArray();
-                $carry = array_merge($carry, $filterArray);
-                return $carry;
-            }, []);
+             $this->_mongoQuery['filter'] = array_reduce($this->_parts['filter'], function ($carry, AbstractFilter $filter) {
+                 $filterArray = $filter->toArray();
+                 $carry = array_merge($carry, $filterArray);
+                 return $carry;
+             }, []);
 
-        }
+         }
 
-        return $this->_mongoQuery;
-    }
+         return $this->_mongoQuery;
+     }
 
     /**
      * Sets the filter to use in a Query object. Filters added using this method
